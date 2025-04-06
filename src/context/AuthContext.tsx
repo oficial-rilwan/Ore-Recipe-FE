@@ -10,6 +10,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   logout: () => void;
   getUser(): void;
+  isLoading: boolean;
   setUser: React.Dispatch<React.SetStateAction<UserProps>>;
 }
 
@@ -22,26 +23,32 @@ interface AuthProviderProps {
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const { show, message, triggerToast, type } = useToast();
   const [user, setUser] = React.useState<UserProps | null>(null);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   React.useEffect(() => {
-    const onFocus = () => {
+    const fetchUser = () => {
       if (document.visibilityState === "visible") getUser();
     };
 
-    window.addEventListener("focus", onFocus);
-    document.addEventListener("visibilitychange", onFocus);
+    fetchUser();
+
+    window.addEventListener("focus", fetchUser);
+    document.addEventListener("visibilitychange", fetchUser);
 
     return () => {
-      window.removeEventListener("focus", onFocus);
-      document.removeEventListener("visibilitychange", onFocus);
+      window.removeEventListener("focus", fetchUser);
+      document.removeEventListener("visibilitychange", fetchUser);
     };
   }, []);
 
   async function getUser() {
     try {
+      setIsLoading(true);
       const { data } = await userRepo.me();
       setUser(data);
+      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       if (error?.response?.status === 401) setUser(null);
     }
   }
@@ -58,7 +65,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated: !!user, logout, user, getUser, setUser }}>
+    <AuthContext.Provider value={{ isAuthenticated: !!user, logout, user, getUser, setUser, isLoading }}>
       <ToastMessage show={show} message={message} type={type} />
       {children}
     </AuthContext.Provider>
