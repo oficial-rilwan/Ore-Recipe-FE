@@ -1,6 +1,6 @@
 import api from "../config/httpConfig";
 
-class BaseService {
+class BaseRepository {
   constructor(public url: string) {
     this.url = url;
   }
@@ -14,7 +14,7 @@ class BaseService {
   get(id: string) {
     return api.get(`${this.url}/${id}`);
   }
-  find(query: { [key: string]: string | number }) {
+  find(query?: { [key: string]: string | number }) {
     return api.get(this.url, { params: { ...query } });
   }
   delete(id: string) {
@@ -22,4 +22,4 @@ class BaseService {
   }
 }
 
-export default BaseService;
+export default BaseRepository;
