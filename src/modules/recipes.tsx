@@ -17,7 +17,6 @@ const Recipes = () => {
   });
 
   const recipes = query?.data?.data?.data as RecipeProps[];
-
   return (
     <React.Fragment>
       <Header />
@@ -26,7 +25,7 @@ const Recipes = () => {
           <div className="fs-5 mb-4">
             Search results for: <span className="fs-3 fw-bold">{searchTerm}</span>
           </div>
-          {!recipes?.length && searchTerm ? (
+          {!query.isPending && !recipes?.length && searchTerm ? (
             <div className="py-5">
               <div className="text-center fw-bold fs-3">0 results found for your search.</div>
               <div className="fw-medium fs-6 text-center">Please try another search term</div>

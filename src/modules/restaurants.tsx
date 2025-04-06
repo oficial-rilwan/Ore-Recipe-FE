@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { useLocation } from "react-router-dom";
 import restaurantsRepo from "../repo/restaurants.repo";
-import { RestaurantProps } from "../types/types";
+import { RestaurantProps, SearchHistoryProps } from "../types/types";
 import RestaurantCard from "../components/RestaurantCard";
 import Header from "../components/Header";
 import IMAGES from "../constants/images";

@@ -4,7 +4,7 @@ import restaurantsRepo from "../repo/restaurants.repo";
 import { useQueries } from "@tanstack/react-query";
 import Header from "../components/Header";
 import IMAGES from "../constants/images";
-import { RecipeProps, RestaurantProps } from "../types/types";
+import { RecipeProps, RestaurantProps, SearchHistoryProps } from "../types/types";
 import PATHNAMES from "../constants/pathnames";
 import { Link } from "react-router-dom";
 import RecipeCard from "../components/RecipeCard";

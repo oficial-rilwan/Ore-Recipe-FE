@@ -5,7 +5,16 @@ import { FaBan, FaLock, FaSearch, FaSignOutAlt, FaUser, FaUserCircle, FaUtensils
 import { AuthContext } from "../context/AuthContext";
 import { Dropdown } from "react-bootstrap";
 import DeactivateAccountModal from "./DeactivateAccountModal";
+import { SearchHistoryProps } from "../types/types";
+import restaurantsRepo from "../repo/restaurants.repo";
+import { useQuery } from "@tanstack/react-query";
+import recipeRepo from "../repo/recipe.repo";
+import useDebounce from "../hooks/useDebounce";
 
+type HeaderProps = {
+  searchTerm?: string;
+  searchHistory?: SearchHistoryProps[];
+};
 export function Logo() {
   return (
     <Link to={PATHNAMES.HOME} className="logo d-flex justify-content-center align-items-center">
@@ -22,11 +31,30 @@ const Header = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [keyword, setKeyword] = React.useState("");
 
+  const _searchTerm = useDebounce(keyword);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (pathname.includes(PATHNAMES.RESTAURANTS)) return navigate(`${PATHNAMES.RESTAURANTS}?search=${keyword}`);
     navigate(`${PATHNAMES.RECIPES}?search=${keyword}`);
   };
+
+  const recipeHistoryQuery = useQuery({
+    enabled: !pathname.includes(PATHNAMES.RESTAURANTS),
+    queryKey: ["recipes-search-history", _searchTerm, pathname],
+    queryFn: () => recipeRepo.searchHistory({ limit: 10, search: _searchTerm }),
+  });
+
+  const restaurantHistoryQuery = useQuery({
+    enabled: pathname.includes(PATHNAMES.RESTAURANTS),
+    queryKey: ["restaurants-search-history", _searchTerm, pathname],
+    queryFn: () => restaurantsRepo.searchHistory({ limit: 10, search: _searchTerm }),
+  });
+
+  const searchHistory = pathname.includes(PATHNAMES.RESTAURANTS)
+    ? (restaurantHistoryQuery?.data?.data?.data as SearchHistoryProps[])
+    : (recipeHistoryQuery?.data?.data?.data as SearchHistoryProps[]);
+
   return (
     <React.Fragment>
       <header className="p-4">
@@ -39,11 +67,14 @@ const Header = () => {
               <div className="input-group">
                 <input
                   required
+                  id="search"
                   type="text"
                   name="search"
                   className="form-control"
                   value={keyword}
+                  list="search-history"
                   onChange={(e) => setKeyword(e.target.value)}
+                  autoComplete="off"
                   placeholder={
                     pathname.includes(PATHNAMES.RESTAURANTS)
                       ? "Find restaurants and locations"
@@ -54,6 +85,11 @@ const Header = () => {
                   <FaSearch className="text-white" />
                 </button>
               </div>
+              <datalist id="search-history">
+                {searchHistory?.map((item, idx) => (
+                  <option key={idx} value={item?.query} />
+                ))}
+              </datalist>
             </form>
           </div>
           <div className="col">
