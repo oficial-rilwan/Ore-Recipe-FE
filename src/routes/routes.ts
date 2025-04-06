@@ -1,4 +1,5 @@
 import PATHNAMES from "../constants/pathnames";
+import NotFound from "../modules/404";
 import Register from "../modules/auth/register";
 import SignIn from "../modules/auth/signin";
 import HomePage from "../modules/home";
@@ -41,6 +42,12 @@ const ROUTES = [
     path: PATHNAMES.RESTAURANTS,
     isProtected: false,
     component: Restaurants,
+    exact: true,
+  },
+  {
+    path: "*",
+    isProtected: false,
+    component: NotFound,
     exact: true,
   },
 ];

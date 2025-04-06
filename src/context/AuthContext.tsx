@@ -3,6 +3,7 @@ import { UserProps } from "../types/types";
 import { useToast } from "../hooks/useToast";
 import ToastMessage from "../components/ToastMessage";
 import userRepo from "../repo/user.repo";
+import PATHNAMES from "../constants/pathnames";
 
 interface AuthContextType {
   user: UserProps | null;
@@ -23,7 +24,17 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = React.useState<UserProps | null>(null);
 
   React.useEffect(() => {
-    getUser();
+    const onFocus = () => {
+      if (document.visibilityState === "visible") getUser();
+    };
+
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onFocus);
+
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onFocus);
+    };
   }, []);
 
   async function getUser() {
@@ -40,6 +51,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       await userRepo.signout();
       setUser(null);
       triggerToast("User logged out successfully...", "success");
+      window.location.replace(PATHNAMES.HOME);
     } catch (error) {
       triggerToast(error?.response?.data?.error, "success");
     }
