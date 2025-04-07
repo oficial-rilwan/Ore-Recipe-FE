@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "../components/Header";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import recipeRepo from "../repo/recipe.repo";
 import { RecipeProps } from "../types/types";
@@ -13,10 +13,11 @@ import NotFound from "./404";
 
 const Recipe = () => {
   const { id } = useParams();
+  const location = useLocation();
 
-  React.useEffect(() => {
-    window.scroll(0, 0);
-  }, [id]);
+  React.useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [location.pathname]);
 
   const query = useQuery({
     queryKey: ["recipe", id],

@@ -8,8 +8,13 @@ import RecipeCard from "../components/RecipeCard";
 import { Loader } from "../components/Loader";
 
 const Recipes = () => {
-  const searchParams = new URLSearchParams(useLocation().search);
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
   const searchTerm = searchParams.get("search");
+
+  React.useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [location.pathname]);
 
   const query = useQuery({
     queryKey: ["recipes", searchTerm],
